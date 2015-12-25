@@ -9,6 +9,7 @@ use std::char;
 use std::rc::Rc;
 use std::cell::{RefCell};
 use std::ops::{Deref, DerefMut};
+use std::thread;
 use std::process;
 
 
@@ -70,13 +71,27 @@ impl TowerPlugin {
     fn submit_overtime(&mut self) {
 
         // kill old process
-        if let Some(mut process) = self.process.take() {
-            process.kill();
-        }
+        //if let Some(mut process) = self.process.take() {
+            //process.kill();
+        //}
 
-        let process = process::Command::new("/home/Downloads/tower-tool")
-                                        .spawn()
-                                        .unwrap();
+        //let process = process::Command::new("/home/Downloads/tower-tool")
+                                        //.spawn()
+                                        //.unwrap();
+
+        let work = thread::spawn(move || {
+            let output = process::Command::new("/home/Downloads/tower-tool")
+                                            .arg("-e")
+                                            .arg("a")
+                                            .arg("-p")
+                                            .arg("p")
+                                            .output()
+                                            .unwrap();
+
+            println!("exit, is: {}, {}", output.status.code().unwrap(), String::from_utf8_lossy(&output.stdout));
+
+            self.user_name.set_text("aaa");
+        });
     }
 
     fn import_from_cr(&self) {
