@@ -11,6 +11,8 @@ use std::cell::{RefCell};
 use std::ops::{Deref, DerefMut};
 use std::thread;
 use std::process;
+use std::sync::{Arc, Mutex};
+use std::sync::mpsc::{channel, Receiver};
 
 
 struct TowerPlugin {
@@ -25,7 +27,7 @@ struct TowerPlugin {
     entry_fr: gtk::TextView,
     entry_m1: gtk::TextView,
     entry_m2: gtk::TextView,
-    process: Option<std::process::Child>,
+    receiver: RefCell<Option<(gtk::TextBuffer, Receiver<String>)>>,
 }
 
 impl TowerPlugin {
@@ -70,28 +72,30 @@ impl TowerPlugin {
 
     fn submit_overtime(&mut self) {
 
-        // kill old process
-        //if let Some(mut process) = self.process.take() {
-            //process.kill();
-        //}
+        //let a = Arc::new(Mutex::new(self.user_name));
 
-        //let process = process::Command::new("/home/Downloads/tower-tool")
-                                        //.spawn()
-                                        //.unwrap();
+        //let mut d = a.lock().unwrap();
+        //thread::spawn(move || {
+            //d.set_text("aa");
+        //});
 
-        let work = thread::spawn(move || {
-            let output = process::Command::new("/home/Downloads/tower-tool")
-                                            .arg("-e")
-                                            .arg("a")
-                                            .arg("-p")
-                                            .arg("p")
-                                            .output()
-                                            .unwrap();
+        //let work = thread::spawn(move || {
+            //let output = process::Command::new("/home/Downloads/tower-tool")
+                                            //.arg("-e")
+                                            //.arg("a")
+                                            //.arg("-p")
+                                            //.arg("p")
+                                            //.output()
+                                            //.unwrap();
 
-            println!("exit, is: {}, {}", output.status.code().unwrap(), String::from_utf8_lossy(&output.stdout));
+            //println!("exit, is: {}, {}", output.status.code().unwrap(), String::from_utf8_lossy(&output.stdout));
 
-            self.user_name.set_text("aaa");
-        });
+            //t.deref().borrow_mut().deref().import_from_cr();
+            //o.user_name.set_text("a");
+            //self.user_name.set_text("aaa");
+        //});
+
+        //let (rx, tx) = channel();
     }
 
     fn import_from_cr(&self) {
@@ -236,7 +240,7 @@ impl TowerPlugin {
             entry_fr: entry_fr,
             entry_m1: entry_m1,
             entry_m2: entry_m2,
-            process: None,
+            receiver: RefCell::new(None),
         }));
 
         let tower = tower_plugin.clone();
